@@ -28,7 +28,7 @@ class Accounts:
     def load(self, json_path):
         with open(json_path, 'r') as f:
             self._accounts = json.load(f)['accounts']
-    
+
     def auth(self, name, password):
         return name in self._accounts and \
                _verify_password(self._accounts[name]['password'], password)
@@ -42,7 +42,7 @@ class Accounts:
     def save(self, json_path):
         with open(json_path, 'w') as f:
             json.dump({'accounts': self._accounts}, f, indent=2)
-    
+
     def get_info(self, name):
         if name not in self._accounts:
             raise ValueError(f'account not existed {name}')
@@ -51,12 +51,15 @@ class Accounts:
 
 
 if __name__ == '__main__':
-    a = Accounts('accounts.json')  # append new account
-    # a = Accounts() # new accounts json
-    while True:
+    def create_account():
+        a = Accounts('accounts.json')  # append new account
+        # a = Accounts() # new accounts json
         name = input('name:')
         password = input('password:')
         config_json = input('config json:')
         config = json.loads(config_json)
         a.new(name, password, config)
         a.save('accounts.json')
+
+    while True:
+        create_account()

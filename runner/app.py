@@ -1,7 +1,8 @@
 from functools import wraps
 from flask import Flask, request, jsonify, app, g
-from runner import CommandRunner
-from accounts import Accounts
+from .runner import CommandRunner
+from .accounts import Accounts
+from .command import make_demo_cmd_dict, get_cmd_dict
 
 
 app = Flask(__name__)
@@ -21,18 +22,7 @@ def auth(func):
         return func(*args, **kwargs)
     return auth_decorator
 
-
-def success_cb(cmd, pid, output):
-    print(f'---- success {pid} {cmd} ----')
-    print(output)
-
-
-def error_cb(cmd, pid, output):
-    print(f'---- error {pid} {cmd} ----')
-    print(output)
-
-
-runner = CommandRunner(5, success_cb, error_cb)
+runner = CommandRunner()
 runner.run()
 
 
@@ -52,8 +42,23 @@ def list_running():
 @auth
 def submit_task():
     cmd = request.json.get('cmd')
-    runner.submit(cmd)
-    return jsonify({'a':1})
+    if cmd is None:
+        cmd = request.json.get('cmd_code')
+        if cmd is not None and g.user_config.get('class') == 'super':
+            cmd_dict = make_demo_cmd_dict(cmd)
+            cmd_dict['user_info'] = g.user_info
+            cmd_dict['arg'] = request.json
+            runner.submit(cmd_dict)
+            return jsonify({'result': 'super'})
+        return 'Bad Request', 400
+
+    cmd_dict = get_cmd_dict(cmd, request.json)
+    if cmd_dict is None:
+        return 'Bad Request', 400
+    cmd_dict['user_info'] = g.user_info
+    cmd_dict['arg'] = request.json
+    runner.submit(cmd_dict)
+    return jsonify({'result': 'ok'})
 
 
 if __name__ == '__main__':

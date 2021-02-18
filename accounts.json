@@ -3,12 +3,16 @@
     "user": {
       "password": "d836ee7a943ec0bf1776e3972de90fa080ab3fc76d5cbe06bb4cca910df4006bf05ebb2a",
       "config": {
+        "wd": "workplace/user",
         "hello": "account"
       }
     },
-    "user1234": {
+    "super": {
       "password": "5d2d1c3af8a03f95ede1149017647ccf2e178186b1d0fdbc5919cf6a4e5e3f9010b1de42",
-      "config": {}
+      "config": {
+        "wd": "workplace/super",
+        "class": "super"
+      }
     }
   }
 }
